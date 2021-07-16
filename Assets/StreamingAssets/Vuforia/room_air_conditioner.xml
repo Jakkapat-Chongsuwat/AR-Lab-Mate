@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+<Tracking>
+<ModelTarget name="room_air_conditioner" motionHint="static" trackingMode="default"/>
+
+</Tracking>
+
+<Assembly name="room_air_conditioners_assembly" assemblyId="e966dca1bfc943e89fcef3c2bb46acb5">
+<Part name="room_air_conditioner" translation="0 0 0" rotation="AD: 0 0 1 0"/>
+<EntryPoint name="viewpoint_0000" translation="1.93483 43.7956 186.19" rotation="AD: 0.999999999313344 0.002075722398985059 -0.017974720269503534 193.173" trained="no">
+
+</EntryPoint>
+
+</Assembly>
+
+</QCARConfig>
