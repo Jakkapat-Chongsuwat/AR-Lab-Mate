@@ -22,9 +22,9 @@ jobs:
       - name: Run a multi-line script
         run: |
           echo "Starting Unity Cloud Build Action.."
-          if [[ "${{ github.event.commits[0].message }}" == *"#BUILD_WINDOW64"* ]]; then
+          if [[ "${{ github.event.commits[0].message }}" == *"#BUILD_WINDOWS64"* ]]; then
             echo "Triggering Window64 Build.."
-            curl https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOW64 }}/builds -H "Authorization: Basic ${{ secrets.API_KEY }}" -X POST -d '{"clean": true, "delay": 30}' -H "Content-Type: application/json"
+            curl https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds -H "Authorization: Basic ${{ secrets.API_KEY }}" -X POST -d '{"clean": true, "delay": 30}' -H "Content-Type: application/json"
           fi
           echo "Starting Unity Cloud Build Action.."
           if [[ "${{ github.event.commits[0].message }}" == *"#BUILD_ANDROID"* ]]; then
