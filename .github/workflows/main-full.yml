@@ -35,7 +35,6 @@ jobs:
           echo "Starting Unity Cloud Build.."
           curl https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds -H "Authorization: Basic ${{ secrets.API_KEY }}" -X POST -d '{"clean": false, "delay": 30}' -H "Content-Type: application/json"
           echo "Setting artifact path.."
-          PLAYER_PATH=$(cygpath -wa "$UNITY_PLAYER_PATH")
           echo "export ARTIFACT_PATH=${PLAYER_PATH}" >> $GITHUB_ENV
         env:
           UNITY_PLAYER_PATH: ${{ env.UNITY_PLAYER_PATH }}
