@@ -61,7 +61,6 @@ jobs:
           UNITY_BUILD_VERSION: ${{ env.UNITY_BUILD_VERSION }}
       
       - name: Upload Unity build version to Firebase Storage
-        needs: Upload build archive to Firebase Storage
         run: |
           echo "Uploading Unity build version to Firebase Storage.."
           echo "Unity build version: $UNITY_PRODUCT_VERSION" >> Version.txt
