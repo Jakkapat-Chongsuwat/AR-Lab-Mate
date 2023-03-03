@@ -104,7 +104,6 @@ jobs:
       #     BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
 
       - name: Commit and push changes
-        needs: Upload build archive to Firebase Storage
         run: |
           echo "Committing and pushing changes.."
           git config user.name "GitHub Actions"
