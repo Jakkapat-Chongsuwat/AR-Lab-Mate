@@ -77,4 +77,10 @@ jobs:
         run: |
           echo "Committing and pushing changes.."
           git config user.name "GitHub Actions"
-          git
+          git config user.email "github-actions@github.com"
+          git add "${UNITY_BUILD_VERSION_FILE_PATH}"
+          git commit -m "Update build version to ${{ env.UNITY_PRODUCT_VERSION }}"
+          git push
+        env:
+          UNITY_BUILD_VERSION_FILE_PATH: "path/to/build/version/file"
+          UNITY_PRODUCT_VERSION: ${{ env.UNITY_PRODUCT_VERSION }}
