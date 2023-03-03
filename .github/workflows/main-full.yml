@@ -19,12 +19,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
-      - name: Install Unity
-        uses: game-ci/setup-unity@v1
-        with:
-          unityVersion: "${{ env.unity_version }}"
-          
+                  
       - name: Update Unity build version
         run: |
           echo "Incrementing Unity build version.."
