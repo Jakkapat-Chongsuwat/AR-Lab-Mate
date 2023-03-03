@@ -39,7 +39,6 @@ jobs:
           UNITY_PLAYER_PATH: ${{ env.UNITY_PLAYER_PATH }}
 
       - name: Update Unity build version
-        needs: Unity Cloud Build
         run: |
           echo "Incrementing Unity build version.."
           current_version=$(grep -oP '(?<=m_Version: )\d+\.\d+\.\d+' "${{ env.UNITY_PROJECT_PATH }}/ProjectSettings/ProjectVersion.txt")
@@ -53,7 +52,6 @@ jobs:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
           
       - name: Upload build archive to Firebase Storage
-        needs: Update Unity build version
         run: |
           echo "Uploading build archive to Firebase Storage.."
           gsutil cp <PATH_TO_BUILD_ARCHIVE> gs://${FIREBASE_STORAGE_BUCKET}/${BUILD_TARGET_NAME}_build_${UNITY_BUILD_VERSION}.zip
@@ -74,7 +72,6 @@ jobs:
           BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
           
       - name: Commit and push changes
-        needs: [Upload build archive to Firebase Storage, Upload Unity build version to Firebase Storage]
         run: |
           echo "Committing and pushing changes.."
           git config user.name "GitHub Actions"
