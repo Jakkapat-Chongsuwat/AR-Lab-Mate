@@ -6,9 +6,11 @@ on:
   workflow_dispatch:
 
 env:
-  unity_version: "2019.4.37f1"
+  UNITY_VERSION: "2019.4.37f1"
   UNITY_PRODUCT_VERSION: "$(cat ${UNITY_BUILD_VERSION_FILE_PATH})"
+  UNITY_PROJECT_PATH: ""
   UNITY_BUILD_VERSION_FILE_PATH: "path/to/build/version/file"
+  ARTIFACT_PATH: ""
   FIREBASE_STORAGE_BUCKET: "<FIREBASE_STORAGE_BUCKET>"
   FIREBASE_SERVICE_ACCOUNT_KEY: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}"
   BUILD_TARGET_NAME: "${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}"
@@ -26,7 +28,7 @@ jobs:
           echo "Setting Unity project path.."
           UNITY_PROJECT_PATH=$(find "${{ github.workspace }}" -type d -name Assets -print -quit | sed 's/Assets$//')
           echo "Unity project path: ${UNITY_PROJECT_PATH}"
-          echo "::set-env name=UNITY_PROJECT_PATH::${UNITY_PROJECT_PATH}"
+          echo "export UNITY_PROJECT_PATH=${UNITY_PROJECT_PATH}" >> $GITHUB_ENV
                       
       - name: Unity Cloud Build
         run: |
@@ -34,7 +36,7 @@ jobs:
           curl https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds -H "Authorization: Basic ${{ secrets.API_KEY }}" -X POST -d '{"clean": false, "delay": 30}' -H "Content-Type: application/json"
           echo "Setting artifact path.."
           PLAYER_PATH=$(cygpath -wa "$UNITY_PLAYER_PATH")
-          echo "::set-env name=ARTIFACT_PATH::${PLAYER_PATH}"
+          echo "export ARTIFACT_PATH=${PLAYER_PATH}" >> $GITHUB_ENV
         env:
           UNITY_PLAYER_PATH: ${{ env.UNITY_PLAYER_PATH }}
 
