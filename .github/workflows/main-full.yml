@@ -1,0 +1,80 @@
+name: Unity Build Workflow
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  unity_project_path: "path/to/unity/project"
+  unity_version: "2019.4.37f1"
+  firebase_storage_bucket: "<FIREBASE_STORAGE_BUCKET>"
+  build_target_name: "<BUILD_TARGET_NAME>"
+  build_method: "<BUILD_METHOD>"
+  build_number: ${{ github.run_number }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Install Unity
+        uses: game-ci/setup-unity@v1
+        with:
+          unityVersion: "${{ env.unity_version }}"
+          
+      - name: Update Unity build version
+        run: |
+          echo "Incrementing Unity build version.."
+          current_version=$(grep -oP '(?<=m_Version: )\d+\.\d+\.\d+' "${{ env.unity_project_path }}/ProjectSettings/ProjectVersion.txt")
+          new_version=$(echo "${current_version}" | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
+          echo "Current version: ${current_version}"
+          echo "New version: ${new_version}"
+          sed -i -e "s/m_Version: ${current_version}/m_Version: ${new_version}/g" "${unity_project_path}/ProjectSettings/ProjectVersion.txt"
+          echo "${new_version}" > "${UNITY_BUILD_VERSION_FILE_PATH}"
+        env:
+          UNITY_PROJECT_PATH: ${{ env.unity_project_path }}
+          UNITY_BUILD_VERSION_FILE_PATH: "path/to/build/version/file"
+          
+      - name: Build Unity project
+        run: |
+          echo "Building Unity project.."
+          unity-editor -projectPath "${UNITY_PROJECT_PATH}" -batchmode -nographics -quit -buildTarget "${BUILD_TARGET_NAME}" -executeMethod "${BUILD_METHOD}"
+        env:
+          UNITY_PROJECT_PATH: ${{ env.unity_project_path }}
+          BUILD_TARGET_NAME: ${{ env.build_target_name }}
+          BUILD_METHOD: ${{ env.build_method }}
+          
+      - name: Archive build
+        uses: actions/upload-artifact@v2
+        with:
+          name: Build
+          path: <PATH_TO_BUILD_ARCHIVE>
+
+      - name: Upload build archive to Firebase Storage
+        run: |
+          echo "Uploading build archive to Firebase Storage.."
+          gsutil cp <PATH_TO_BUILD_ARCHIVE> gs://"${FIREBASE_STORAGE_BUCKET}"/"${BUILD_TARGET_NAME}"_build_"${BUILD_NUMBER}".zip
+        env:
+          FIREBASE_STORAGE_BUCKET: ${{ env.firebase_storage_bucket }}
+          BUILD_TARGET_NAME: ${{ env.build_target_name }}
+          BUILD_NUMBER: ${{ env.build_number }}
+      
+      - name: Upload Unity build version to Firebase Storage
+        run: |
+          echo "Uploading Unity build version to Firebase Storage.."
+          echo "Unity build version: $UNITY_PRODUCT_VERSION" > version.txt
+          gsutil cp version.txt gs://"${FIREBASE_STORAGE_BUCKET}"/"${BUILD_TARGET_NAME}"_build_latest_version
+        env:
+          UNITY_PRODUCT_VERSION: ${{ env.UNITY_PRODUCT_VERSION }}
+          FIREBASE_STORAGE_BUCKET: ${{ env.firebase_storage_bucket }}
+          BUILD_TARGET_NAME: ${{ env.build_target_name }}
+          
+      - name: Commit and push changes
+        needs: [Upload build archive to Firebase Storage, Upload Unity build version to Firebase Storage]
+        run: |
+          echo "Committing and pushing changes.."
+          git config user.name "GitHub Actions"
+          git
