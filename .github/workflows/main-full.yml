@@ -36,7 +36,7 @@ jobs:
           curl https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds -H "Authorization: Basic ${{ secrets.API_KEY }}" -X POST -d '{"clean": false, "delay": 30}' -H "Content-Type: application/json"
 
           echo "Waiting for artifact..."
-          PLAYER_PATH=$(bash ./Post-Build.sh)
+          PLAYER_PATH=$(bash .github/workflows/Post-Build.sh)
           echo "Artifact found at ${PLAYER_PATH}"
 
           echo "Setting artifact path.."
