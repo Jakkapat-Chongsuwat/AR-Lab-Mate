@@ -34,14 +34,25 @@ jobs:
         run: |
           echo "Starting Unity Cloud Build.."
           curl https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds -H "Authorization: Basic ${{ secrets.API_KEY }}" -X POST -d '{"clean": false, "delay": 30}' -H "Content-Type: application/json"
-          echo "Setting artifact path.."
+
           echo "Waiting for artifact..."
-          until [ -f "${UNITY_PLAYER_PATH}" ]
+          PLAYER_PATH=$(bash ./scripts/Post-Build.sh)
+          echo "Artifact found at ${PLAYER_PATH}"
+
+          echo "Setting artifact path.."
+          echo "export ARTIFACT_PATH=${PLAYER_PATH}" >> $GITHUB_ENV
+
+      - name: Wait for artifact
+        shell: bash
+        run: |
+          echo "Waiting for artifact..."
+          until [ -f "${ARTIFACT_PATH}" ]
           do
             sleep 5
           done
-          echo "Artifact found at ${UNITY_PLAYER_PATH}"
-          echo "export ARTIFACT_PATH=${UNITY_PLAYER_PATH}" >> $GITHUB_ENV
+          echo "Artifact found at ${ARTIFACT_PATH}"
+        env:
+          ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
 
       - name: Update Unity build version
         run: |
