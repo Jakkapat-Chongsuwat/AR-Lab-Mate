@@ -47,7 +47,7 @@ jobs:
           echo "New version: ${new_version}"
           sed -i -e "s/${current_version}/${new_version}/g" "${UNITY_BUILD_VERSION_FILE_PATH}"
           echo "${new_version}" > "${UNITY_BUILD_VERSION_FILE_PATH}"
-              env:
+        env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
           
       - name: Upload build archive to Firebase Storage
