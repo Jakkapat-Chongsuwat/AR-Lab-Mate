@@ -9,7 +9,7 @@ env:
   UNITY_VERSION: "2019.4.37f1"
   UNITY_PRODUCT_VERSION: "$(cat ${UNITY_BUILD_VERSION_FILE_PATH})"
   UNITY_PROJECT_PATH: ""
-  UNITY_BUILD_VERSION_FILE_PATH: "Version.txt"
+  UNITY_BUILD_VERSION_FILE_PATH: "/home/runner/work/AR-Lab-Mate/AR-Lab-Mate/Version.txt"
   ARTIFACT_PATH: ""
   FIREBASE_STORAGE_BUCKET: "<FIREBASE_STORAGE_BUCKET>"
   FIREBASE_SERVICE_ACCOUNT_KEY: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}"
@@ -35,21 +35,18 @@ jobs:
           echo "Starting Unity Cloud Build.."
           curl https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds -H "Authorization: Basic ${{ secrets.API_KEY }}" -X POST -d '{"clean": false, "delay": 30}' -H "Content-Type: application/json"
           echo "Setting artifact path.."
-          echo "export ARTIFACT_PATH=${PLAYER_PATH}" >> $GITHUB_ENV
-        env:
-          UNITY_PLAYER_PATH: ${{ env.UNITY_PLAYER_PATH }}
+          echo "export ARTIFACT_PATH=${UNITY_PLAYER_PATH}" >> $GITHUB_ENV
 
       - name: Update Unity build version
         run: |
           echo "Incrementing Unity build version.."
-          current_version=$(grep -oP '(?<=m_Version: )\d+\.\d+\.\d+' "${{ env.UNITY_BUILD_VERSION_FILE_PATH }}")
+          current_version=$(grep -oP '(?<=m_Version: )\d+\.\d+\.\d+' "${UNITY_BUILD_VERSION_FILE_PATH}")
           new_version=$(echo "${current_version}" | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
           echo "Current version: ${current_version}"
           echo "New version: ${new_version}"
-          sed -i -e "s/m_Version: ${current_version}/m_Version: ${new_version}/g" "${{ env.UNITY_BUILD_VERSION_FILE_PATH }}"
+          sed -i -e "s/m_Version: ${current_version}/m_Version: ${new_version}/g" "${UNITY_BUILD_VERSION_FILE_PATH}"
           echo "${new_version}" > "${UNITY_BUILD_VERSION_FILE_PATH}"
         env:
-          UNITY_PROJECT_PATH: ${{ env.UNITY_PROJECT_PATH }}
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
           
       - name: Upload build archive to Firebase Storage
