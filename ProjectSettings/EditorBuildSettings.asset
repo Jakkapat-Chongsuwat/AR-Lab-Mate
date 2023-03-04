@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scene/Double_PipeHX/Main_Menu.unity
     guid: 41c492ae01dcfa042a1eb32cae95482a
   - enabled: 0
@@ -23,22 +23,22 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scene/Double_PipeHX/How to/How to.unity
     guid: b65b7dae19ef7844db3a2a6f1a9ba6db
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scene/Flow Meter/Flow Meter Scene.unity
     guid: 06ae61836e00b0d42b240a252973636a
   - enabled: 0
     path: 
-    guid: 30ace6a7a424db6448247029488dca77
+    guid: 00000000000000000000000000000000
   - enabled: 0
     path: Assets/Scene/Double_PipeHX/Theory/Theory.unity
     guid: 9ed06c278f0d73b4d9bf7e9262e265e5
   - enabled: 0
     path: Assets/Scene/Double_PipeHX/Theory/Theory Energy Balance.unity
     guid: 8e788eae25c06084aa4ba18f44b3537a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scene/Double_PipeHX/VDO.unity
     guid: d5244c27ae5cf334aae33f7fab456f3a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scene/Pack Bed/Packed Column Scene.unity
     guid: ee3b411cd6379ad4697209d6e77dc135
   m_configObjects: {}
