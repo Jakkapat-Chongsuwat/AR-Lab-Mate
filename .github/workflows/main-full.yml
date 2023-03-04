@@ -33,26 +33,35 @@ jobs:
       - name: Unity Cloud Build
         run: |
           echo "Starting Unity Cloud Build.."
-          curl https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds -H "Authorization: Basic ${{ secrets.API_KEY }}" -X POST -d '{"clean": false, "delay": 30}' -H "Content-Type: application/json"
+          response=$(curl -s -X POST \
+          https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID }}/builds \
+          -H "Authorization: Basic ${{ secrets.API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"clean": false, "delay": 0, "scm": {"branch": "${{ github.ref }}", "commitId": "${{ github.sha }}", "commitMessage": "${{ github.event.head_commit.message }}", "commitDate": "${{ github.event.head_commit.timestamp }}"}}')
+          build_id=$(echo $response | jq -r '.build.id')
+          echo "Build ID: $build_id"
 
-          echo "Waiting for artifact..."
-          PLAYER_PATH=$(bash .github/workflows/Post-Build.sh)
-          echo "Artifact found at ${PLAYER_PATH}"
-
-          echo "Setting artifact path.."
-          echo "export ARTIFACT_PATH=${PLAYER_PATH}" >> $GITHUB_ENV
-
-      - name: Wait for artifact
-        shell: bash
-        run: |
-          echo "Waiting for artifact..."
-          until [ -f "${ARTIFACT_PATH}" ]
+          status="pending"
+          while [[ "$status" != "success" && "$status" != "failure" && "$status" != "canceled" ]]
           do
+            echo "Checking build status..."
+            status_response=$(curl -s https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID }}/builds/$build_id/status -H "Authorization: Basic ${{ secrets.API_KEY }}")
+            status=$(echo $status_response | jq -r '.buildStatus')
+            echo "Build status: $status"
             sleep 5
           done
-          echo "Artifact found at ${ARTIFACT_PATH}"
-        env:
-          ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
+
+          if [[ "$status" == "success" ]]
+          then
+            echo "Build completed successfully."
+            echo "Setting artifact path.."
+            PLAYER_PATH=$(bash .github/workflows/Post-Build.sh)
+            echo "Artifact found at ${PLAYER_PATH}"
+            echo "export ARTIFACT_PATH=${PLAYER_PATH}" >> $GITHUB_ENV
+          else
+            echo "Build failed or was canceled."
+            exit 1
+          fi
 
       - name: Update Unity build version
         run: |
