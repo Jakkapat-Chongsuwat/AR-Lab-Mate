@@ -58,11 +58,9 @@ jobs:
           then
             echo "Build completed successfully."
             echo "Setting artifact path.."
+            dos2unix ./.github/workflows/PostBuild.sh
             sh ./.github/workflows/PostBuild.sh
-            ARTIFACT_PATH=$(./.github/workflows/PostBuild.sh)
-            echo "Artifact found at ${ARTIFACT_PATH}"
-            # Output the path to the artifact
-            echo "export ARTIFACT_PATH=${ARTIFACT_PATH}" >> $GITHUB_ENV
+            echo "Artifact found at ${{ env.ARTIFACT_PATH }}"
           else
             echo "Build failed or was canceled."
             exit 1
