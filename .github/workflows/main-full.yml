@@ -58,8 +58,8 @@ jobs:
           then
             echo "Build completed successfully."
             echo "Setting artifact path.."
-            chmod +x ./Post-Build.sh
-            ARTIFACT_PATH=$(./Post-Build.sh)
+            chmod +x PostBuild
+            ARTIFACT_PATH=$(PostBuild)
             echo "Artifact found at ${ARTIFACT_PATH}"
             # Output the path to the artifact
             echo "export ARTIFACT_PATH=${ARTIFACT_PATH}" >> $GITHUB_ENV
