@@ -11,7 +11,8 @@ env:
   UNITY_PROJECT_PATH: ""
   UNITY_BUILD_VERSION_FILE_PATH: "Version.txt"
   ARTIFACT_PATH: ""
-  FIREBASE_STORAGE_BUCKET: "<FIREBASE_STORAGE_BUCKET>"
+  BUILD_ARCHIVE_NAME: "Test"
+  FIREBASE_STORAGE_BUCKET: "Storage/MetaSchoolLiteData"
   FIREBASE_SERVICE_ACCOUNT_KEY: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}"
   BUILD_TARGET_NAME: "${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}"
   BUILD_NUMBER: ${{ github.run_number }}
@@ -112,10 +113,11 @@ jobs:
       - name: Upload build archive to Firebase Storage
         run: |
           echo "Uploading build archive to Firebase Storage.."
-          gsutil cp "${env.ARTIFACT_PATH }" gs://"${FIREBASE_STORAGE_BUCKET}"/"${BUILD_TARGET_NAME}"_build_"${BUILD_NUMBER}".zip -I < "${FIREBASE_SERVICE_ACCOUNT_KEY_PATH}"
+          gsutil cp "${env.ARTIFACT_PATH }" gs://"${FIREBASE_STORAGE_BUCKET}"/"${BUILD_ARCHIVE_NAME}.zip -I < "${FIREBASE_SERVICE_ACCOUNT_KEY_PATH}"
         env:
           FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
           FIREBASE_SERVICE_ACCOUNT_KEY_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}
+          BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }}
           BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
           BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
 
