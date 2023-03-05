@@ -39,7 +39,7 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{"clean": false, "delay": 0, "scm": {"branch": "${{ github.ref }}", "commitId": "${{ github.sha }}", "commitMessage": "${{ github.event.head_commit.message }}", "commitDate": "${{ github.event.head_commit.timestamp }}"}}')
           echo "API response: $response"
-          build_id=$(echo $response | jq -r '.buildtargetid')
+          build_id=$(echo $response | jq -r '.[0].buildtargetid')
           echo "Build ID: $build_id"
 
           status="pending"
@@ -47,7 +47,7 @@ jobs:
           do
             echo "Checking build status..."
             status_response=$(curl -s https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id/status -H "Authorization: Basic ${{ secrets.API_KEY }}")
-            status=$(echo $status_response | jq -r '.buildStatus')
+            status=$(echo $status_response | jq -r '.[0].buildStatus')
             echo "Build status: $status"
             sleep 5
           done
