@@ -4,7 +4,7 @@
 ARTIFACT_DIR="$UNITY_PROJECT_PATH/Builds"
 
 # Use the find command to search for the artifact with a .apk extension
-ARTIFACT_PATH=$(find "$ARTIFACT_DIR" -name "*.apk" -type f)
+ARTIFACT_PATH=$(find "$ARTIFACT_DIR" -name "*.zip" -type f)
 
 # Output the path to the artifact
 echo "$ARTIFACT_PATH"
