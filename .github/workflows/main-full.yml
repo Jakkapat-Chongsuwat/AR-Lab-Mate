@@ -58,10 +58,11 @@ jobs:
           then
             echo "Build completed successfully."
             echo "Setting artifact path.."
-            PLAYER_PATH=$(bash .github/workflows/Post-Build.sh)
-            echo "Artifact found at ${PLAYER_PATH}"
-            echo "$ARTIFACT_PATH"
-            echo "export ARTIFACT_PATH=${PLAYER_PATH}" >> $GITHUB_ENV
+            chmod +x Post-Build.sh
+            ARTIFACT_PATH=$(./Post-Build.sh)
+            echo "Artifact found at ${ARTIFACT_PATH}"
+            # Output the path to the artifact
+            echo "export ARTIFACT_PATH=${ARTIFACT_PATH}" >> $GITHUB_ENV
           else
             echo "Build failed or was canceled."
             exit 1
