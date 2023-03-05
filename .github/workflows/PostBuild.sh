@@ -12,5 +12,7 @@ if [[ "$BUILDER_OS" == "WINDOWS" ]]; then
 PLAYER_PATH=$(cygpath -wa "$UNITY_PLAYER_PATH")
 fi
 
-# Output the path to the artifact
 echo "$PLAYER_PATH"
+
+# Set an output variable using the `set-output` command
+echo "::set-output name=ARTIFACT_PATH::$PLAYER_PATH"
