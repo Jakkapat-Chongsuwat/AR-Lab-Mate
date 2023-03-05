@@ -60,6 +60,7 @@ jobs:
             echo "Setting artifact path.."
             PLAYER_PATH=$(bash .github/workflows/Post-Build.sh)
             echo "Artifact found at ${PLAYER_PATH}"
+            echo "$ARTIFACT_PATH"
             echo "export ARTIFACT_PATH=${PLAYER_PATH}" >> $GITHUB_ENV
           else
             echo "Build failed or was canceled."
@@ -82,21 +83,23 @@ jobs:
       - name: Upload build archive to Firebase Storage
         run: |
           echo "Uploading build archive to Firebase Storage.."
-          gsutil cp <PATH_TO_BUILD_ARCHIVE> gs://${FIREBASE_STORAGE_BUCKET}/${BUILD_TARGET_NAME}_build_${UNITY_BUILD_VERSION}.zip
+          gsutil cp "${env.ARTIFACT_PATH }" gs://"${FIREBASE_STORAGE_BUCKET}"/"${BUILD_ARCHIVE_NAME}.zip -I < "${FIREBASE_SERVICE_ACCOUNT_KEY_PATH}"
         env:
           FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_SERVICE_ACCOUNT_KEY_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}
+          BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }}
           BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
-          UNITY_BUILD_VERSION: ${{ env.UNITY_BUILD_VERSION }}
+          BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
       
-      - name: Upload Unity build version to Firebase Storage
-        run: |
-          echo "Uploading Unity build version to Firebase Storage.."
-          echo "Unity build version: $UNITY_PRODUCT_VERSION" >> Version.txt
-          gsutil cp Version.txt gs://${FIREBASE_STORAGE_BUCKET}/Version
-        env:
-          UNITY_PRODUCT_VERSION: ${{ env.UNITY_PRODUCT_VERSION }}
-          FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
-          BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
+      # - name: Upload Unity build version to Firebase Storage
+      #   run: |
+      #     echo "Uploading Unity build version to Firebase Storage.."
+      #     echo "Unity build version: $UNITY_PRODUCT_VERSION" >> Version.txt
+      #     gsutil cp Version.txt gs://${FIREBASE_STORAGE_BUCKET}/Version
+      #   env:
+      #     UNITY_PRODUCT_VERSION: ${{ env.UNITY_PRODUCT_VERSION }}
+      #     FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
+      #     BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
           
       - name: Commit and push changes
         run: |
@@ -109,28 +112,6 @@ jobs:
         env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
           UNITY_PRODUCT_VERSION: ${{ env.UNITY_PRODUCT_VERSION }}
-
-      - name: Upload build archive to Firebase Storage
-        run: |
-          echo "Uploading build archive to Firebase Storage.."
-          gsutil cp "${env.ARTIFACT_PATH }" gs://"${FIREBASE_STORAGE_BUCKET}"/"${BUILD_ARCHIVE_NAME}.zip -I < "${FIREBASE_SERVICE_ACCOUNT_KEY_PATH}"
-        env:
-          FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
-          FIREBASE_SERVICE_ACCOUNT_KEY_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}
-          BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }}
-          BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
-          BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
-
-      # - name: Upload Unity build version to Firebase Storage
-      #   run: |
-      #     echo "Uploading Unity build version to Firebase Storage.."
-      #     echo "Unity build version: ${UNITY_PRODUCT_VERSION}" > Version.txt
-      #     gsutil cp Version.txt gs://"${FIREBASE_STORAGE_BUCKET}"/"${BUILD_TARGET_NAME}"_build_latest_version
-      #   env:
-      #     FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
-      #     FIREBASE_SERVICE_ACCOUNT_KEY_PATH: ${{ env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}
-      #     BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
-      #     BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
 
       - name: Commit and push changes
         run: |
