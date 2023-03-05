@@ -48,7 +48,7 @@ jobs:
             echo "Checking build status..."
             status_response=$(curl -s https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id -H "Authorization: Basic ${{ secrets.API_KEY }}")
             echo "API response: $status_response"
-            status=$(echo $status_response | jq -r '.[0]["buildStatus"]')
+            status=$(echo $status_response | jq -r '.buildStatus')
             echo "Build status: $status"
             sleep 5
           done
