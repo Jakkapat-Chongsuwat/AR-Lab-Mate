@@ -39,7 +39,7 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{"clean": false, "delay": 0, "scm": {"branch": "${{ github.ref }}", "commitId": "${{ github.sha }}", "commitMessage": "${{ github.event.head_commit.message }}", "commitDate": "${{ github.event.head_commit.timestamp }}"}}')
           echo "API response: $response"
-          build_id=$(echo $response | jq -r '.[0].buildtargetid')
+          build_id=$(echo $response | jq -r '.[0].build')
           echo "Build ID: $build_id"
 
           status="pending"
