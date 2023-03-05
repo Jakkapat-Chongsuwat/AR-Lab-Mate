@@ -58,7 +58,7 @@ jobs:
           then
             echo "Build completed successfully."
             echo "Setting artifact path.."
-            chmod +x Post-Build.sh
+            chmod +x ./Post-Build.sh
             ARTIFACT_PATH=$(./Post-Build.sh)
             echo "Artifact found at ${ARTIFACT_PATH}"
             # Output the path to the artifact
