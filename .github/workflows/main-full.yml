@@ -58,7 +58,6 @@ jobs:
           then
             echo "Build completed successfully."
             echo "Setting artifact path.."
-            dos2unix ./.github/workflows/PostBuild.sh
             sh ./.github/workflows/PostBuild.sh
             echo "Artifact found at ${{ env.ARTIFACT_PATH }}"
           else
