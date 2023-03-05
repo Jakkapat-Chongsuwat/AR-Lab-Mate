@@ -1,15 +1,10 @@
 #!/bin/bash
 
-#This is a sample that will simply output the path to the build artifact
+# Set the path to the directory where the artifact is located
+ARTIFACT_DIR="$UNITY_PROJECT_PATH/Builds"
 
-echo "START"
+# Use the find command to search for the artifact with a .apk extension
+ARTIFACT_PATH=$(find "$ARTIFACT_DIR" -name "*.apk" -type f)
 
-PLAYER_PATH=$UNITY_PLAYER_PATH
-
-#IF we are using a Windows Builder and using the path to pass it to a native Windows application we need to properly convert the cygwin player path to windows format
-
-if [[ "$BUILDER_OS" == "WINDOWS" ]]; then
-PLAYER_PATH=$(cygpath -wa "$UNITY_PLAYER_PATH")
-fi
-
-echo "$PLAYER_PATH"
+# Output the path to the artifact
+echo "$ARTIFACT_PATH"
