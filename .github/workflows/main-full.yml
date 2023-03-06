@@ -59,7 +59,18 @@ jobs:
             echo "Setting artifact path.."
             
             # Call Unity Cloud Build API to get artifact share link
-            SHARE_LINK=status=$(echo $status_response | jq -r '.links.download_primary.href')
+            get_share_id_response=$(curl -s -X GET \
+            https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id/share
+            -H "Authorization: Basic ${{ secrets.API_KEY }}" \
+            -H "Content-Type: application/json") 
+            shareid=$(echo $status_response | jq -r '.shareid')
+            echo "API response: $shareid"
+
+            get_share_link_response=$(curl -s -X GET \
+            https://build-api.cloud.unity3d.com/api/v1/shares/{shareid}
+            -H "Authorization: Basic ${{ secrets.API_KEY }}" \
+            -H "Content-Type: application/json") 
+            SHARE_LINK=$(echo $get_build_response | jq -r '.links.download.href')
             echo "API response: $SHARE_LINK"
 
             # Store SHARE_LINK as an environment variable using export
