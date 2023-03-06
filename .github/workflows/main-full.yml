@@ -64,7 +64,7 @@ jobs:
             shareid=$(echo $get_share_id_response | jq -r '.shareid')
             echo "API response: $shareid"
 
-            get_share_link_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/shares/{shareid} -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
+            get_share_link_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/shares/$shareid -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
 
             SHARE_LINK=$(echo $get_share_link_response | jq -r '.links.download.href')
             echo "API response: $SHARE_LINK"
