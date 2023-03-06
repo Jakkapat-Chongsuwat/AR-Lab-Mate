@@ -62,8 +62,10 @@ jobs:
             SHARE_LINK=$(curl -s -X GET \
             -H "Content-Type: application/json" \
             -H "Authorization: Basic ${{ secrets.UNITY_CLOUD_BUILD_API_KEY }}" \
-            https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID }}/builds/${{ secrets.BUILD_NUMBER }}/share | jq -r '.link')
+            https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id/share | jq -r '.link')
             
+            echo "API Link: https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id/share"
+
             # Store SHARE_LINK as an environment variable using export
             export SHARE_LINK=$SHARE_LINK
             echo "Artifact found at $SHARE_LINK"
