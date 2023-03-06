@@ -10,7 +10,6 @@ env:
   UNITY_PRODUCT_VERSION: "$(cat ${UNITY_BUILD_VERSION_FILE_PATH})"
   UNITY_PROJECT_PATH: ""
   UNITY_BUILD_VERSION_FILE_PATH: "Version.txt"
-  ARTIFACT_PATH: ""
   BUILD_ARCHIVE_NAME: "Test"
   FIREBASE_STORAGE_BUCKET: "Storage/MetaSchoolLiteData"
   FIREBASE_SERVICE_ACCOUNT_KEY: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}"
@@ -58,8 +57,16 @@ jobs:
           then
             echo "Build completed successfully."
             echo "Setting artifact path.."
-            sh ./.github/workflows/PostBuild.sh
-            echo "Artifact found at ${{ env.ARTIFACT_PATH }}"
+            
+            # Call Unity Cloud Build API to get artifact share link
+            SHARE_LINK=$(curl -s -X GET \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Basic ${{ secrets.UNITY_CLOUD_BUILD_API_KEY }}" \
+            https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID }}/builds/${{ secrets.BUILD_NUMBER }}/share | jq -r '.link')
+            
+            # Store SHARE_LINK as an environment variable using export
+            export SHARE_LINK=$SHARE_LINK
+            echo "Artifact found at $SHARE_LINK"
           else
             echo "Build failed or was canceled."
             exit 1
@@ -81,7 +88,7 @@ jobs:
       - name: Upload build archive to Firebase Storage
         run: |
           echo "Uploading build archive to Firebase Storage.."
-          gsutil cp "${env.ARTIFACT_PATH}" gs://"${FIREBASE_STORAGE_BUCKET}"/"${BUILD_ARCHIVE_NAME}.zip -I < ${FIREBASE_SERVICE_ACCOUNT_KEY}
+          gsutil cp "${{ env.SHARE_LINK }}" gs://"${FIREBASE_STORAGE_BUCKET}"/"${{ env.BUILD_ID }}".zip -I < ${FIREBASE_SERVICE_ACCOUNT_KEY}
         env:
           FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
           FIREBASE_SERVICE_ACCOUNT_KEY: ${{ env.FIREBASE_SERVICE_ACCOUNT_KEY }}
