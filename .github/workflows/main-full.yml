@@ -9,6 +9,7 @@ env:
   UNITY_VERSION: "2019.4.37f1"
   UNITY_PRODUCT_VERSION: "$(cat ${UNITY_BUILD_VERSION_FILE_PATH})"
   UNITY_PROJECT_PATH: ""
+  SHARE_LINK: ""
   UNITY_BUILD_VERSION_FILE_PATH: "Version.txt"
   BUILD_ARCHIVE_NAME: "Test"
   FIREBASE_STORAGE_BUCKET: "Storage/MetaSchoolLiteData"
@@ -70,8 +71,8 @@ jobs:
             echo "API response: $SHARE_LINK"
 
             # Store SHARE_LINK as an environment variable using export
-            export SHARE_LINK=${SHARE_LINK} >> $GITHUB_ENV
-            echo "Artifact found at $SHARE_LINK"
+            echo "export SHARE_LINK=${SHARE_LINK}" >> $GITHUB_ENV
+            echo "Artifact found at ${{ env.SHARE_LINK }}"
           else
             echo "Build failed or was canceled."
             exit 1
