@@ -70,7 +70,7 @@ jobs:
             echo "API response: $SHARE_LINK"
 
             # Store SHARE_LINK as an environment variable using export
-            export SHARE_LINK=$SHARE_LINK
+            export SHARE_LINK=${SHARE_LINK} >> $GITHUB_ENV
             echo "Artifact found at $SHARE_LINK"
           else
             echo "Build failed or was canceled."
@@ -98,7 +98,15 @@ jobs:
           BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }} 
           SHARE_LINK: ${{ env.SHARE_LINK }}
 
-      # - name: Upload build artifact to Firebase App Distribution
+      # install python for running the script
+      - name: Setup Python and dependencies
+        uses: actions/setup-python@v2
+        with:
+            python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+            architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+      - run: |
+          pip install firebase-admin      # - name: Upload build artifact to Firebase App Distribution
+
       #   uses: w9jds/firebase-action@v1
       #   with:
       #     args: upload ${{ env.BUILD_ARCHIVE_NAME }} Storage/MetaSchoolLiteData
