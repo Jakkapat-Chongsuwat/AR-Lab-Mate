@@ -12,12 +12,12 @@ githubTempPath = '/Users/runner/work/_temp'
 
 # google cloud's service account key file absolute path on github's machine directory
 # note that the file name must be matched with the file name created from timheuer/base64-to-file@v1 action on the workflow
-keyFilePath = githubTempPath + '/<KEY_FILE_NAME>.json'
+keyFilePath = githubTempPath + '/GOOGLE_SERVICE_KEY.json'
 
 # apply the bucket domain to the credentials
 cred = credentials.Certificate(keyFilePath)
 firebase_admin.initialize_app(cred, {
-    'storageBucket' : '<BUCKET_NAME>.appspot.com'
+    'storageBucket' : 'Storage.appspot.com'
 })
 
 # refer to the storage bucket
@@ -25,7 +25,11 @@ bucket = storage.bucket()
 
 # get the upload file's path in repository's directory
 # the file to upload in this scenario (a zip file) is in the same directory with the script
-fileName = '<FILE_TO_UPLOAD>.zip'
+if len(sys.argv) > 1:
+    fileName = 'MetaSchoolLiteData/' + sys.argv[1]
+else:
+    print("Error: File name not specified as a command-line argument.")
+    exit()
 dirname = os.path.dirname(os.path.realpath(__file__))
 fileFullPath = dirname + '/' + fileName
 
