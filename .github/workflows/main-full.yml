@@ -92,9 +92,11 @@ jobs:
           
       - name: Download zip file from URL
         run: |
-          curl -L -o "${BUILD_ARCHIVE_NAME}".zip "${{ env.SHARE_LINK }}"
+          echo "Share link: ${SHARE_LINK}"
+          curl -L -o "${BUILD_ARCHIVE_NAME}".zip "${SHARE_LINK}"
         env:
           BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }} 
+          SHARE_LINK: ${{ env.SHARE_LINK }}
 
       # - name: Upload build artifact to Firebase App Distribution
       #   uses: w9jds/firebase-action@v1
