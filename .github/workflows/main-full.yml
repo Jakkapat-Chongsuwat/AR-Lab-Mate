@@ -92,14 +92,6 @@ jobs:
           echo "${new_version}" > "${UNITY_BUILD_VERSION_FILE_PATH}"
         env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
-          
-      # - name: Download zip file from URL
-      #   run: |
-      #     echo "Download link: ${DOWNLOAD_LINK}"
-      #     curl -L -o ".github/workflows/${BUILD_ARCHIVE_NAME}".zip "${DOWNLOAD_LINK}"
-      #   env:
-      #     BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }} 
-      #     DOWNLOAD_LINK: ${{ env.DOWNLOAD_LINK }}
 
       # install python for running the script
       - name: Setup Python and dependencies
@@ -120,7 +112,7 @@ jobs:
       
       # run the upload script
       - name: run upload script
-        run: python ./upload_file_firebase.py "${BUILD_ARCHIVE_NAME}" # the path to upload script in the repository
+        run: python .github/workflows/upload_file_firebase.py "${BUILD_ARCHIVE_NAME}" # the path to upload script in the repository
         env:
           BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }} 
 
