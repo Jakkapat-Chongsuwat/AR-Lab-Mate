@@ -31,7 +31,7 @@ else:
 dirname = os.path.dirname(os.path.realpath(__file__))
 fileFullPath = dirname + '/' + fileName
 
-# if the file name contains file path, the bucket will create folders corresponding to the path.
+# locate the file in bucket
 blob = bucket.blob(firebaseFolderPath + fileName)
 
 # download from firebase storage
