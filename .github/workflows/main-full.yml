@@ -160,6 +160,12 @@ jobs:
         env:
           FIREBASE_VERSION_FILE_NAME: ${{ env.FIREBASE_VERSION_FILE_NAME }}
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: new_json
+          path: .github/workflows/new_json.json
+
       - name: Run version upload script
         run: python .github/workflows/upload_file_firebase.py "${VERSION_FILE_NAME}" # the path to upload script in the repository
         env:
