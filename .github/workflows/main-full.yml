@@ -144,30 +144,18 @@ jobs:
           value=$(echo $json | jq -r '.mslLauncher')
           echo "New mslLauncher value: $value" 
           
-          # Parse existing JSON object
-          existing_json=$(cat .github/workflows/${FIREBASE_VERSION_FILE_NAME})
-          existing_json="${existing_json%?}" # remove the closing bracket "}" at the end of the existing JSON
-          existing_json=$(echo "${existing_json}" | jq -c '.') # compact JSON with all the keys in one line
-          echo "Existing JSON object: $existing_json" 
+          # Modify JSON object to add launcher's key-value pair
+          new_json=$(echo $json | jq --arg value "${value}" '. + { "mslLauncher": $value }') #New JSON object: mslGame": "new_version","mslLauncher": "mslLauncherVersion"
+          echo "New JSON object: $new_json" 
 
           # Upload existing_json as an artifact
-          echo "${existing_json}" > existing.json
-          echo "Uploading existing.json as artifact..."
-          upload-artifact existing.json
-
-          # Modify JSON object to add launcher's key-value pair
-          new_json=$(echo "${existing_json}" | jq --arg value "${value}" '. + { "mslLauncher": $value }') #New JSON object: mslGame": "new_version","mslLauncher": "mslLauncherVersion"
-          echo "New JSON object: $new_json" 
+          echo "${new_json}" > new_json.json
+          echo "Uploading new_json.json as artifact..."
+          upload-artifact new_json.json 
 
           # Store new_json as an environment variable using export
           echo "NEW_JSON=$(echo "${new_json}" | tr -d '[:space:]')" >> $GITHUB_ENV
-          echo "New JSON object stored as an environment variable"
-
-          # Upload existing_json as an artifact
-          echo "${new_json}" > NEW_JSON.json
-          echo "Uploading NEW_JSON.json as artifact..."
-          upload-artifact NEW_JSON.json         
-
+          echo "New JSON object stored as an environment variable"         
         working-directory: ${{ github.workspace }}
         env:
           FIREBASE_VERSION_FILE_NAME: ${{ env.FIREBASE_VERSION_FILE_NAME }}
