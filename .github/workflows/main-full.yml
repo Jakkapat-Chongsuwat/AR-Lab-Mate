@@ -117,14 +117,12 @@ jobs:
           ls ${UNITY_BUILD_VERSION_FILE_PATH}
           current_version=$(grep -oP '\d+\.\d+\.\d+' "${UNITY_BUILD_VERSION_FILE_PATH}")
           new_version=$(echo "${current_version}" | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
-          new_version_string="${new_version}"
-          echo "New version: ${new_version_string}"
 
           # Set new version as an environment variable
-          echo "export NEW_VERSION=${new_version_string}" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(echo "${new_version}" | tr -d '[:space:]')" >> $GITHUB_ENV
 
           # Create new JSON object with mslGame key-value pair
-          echo '{ "mslGame": "'${new_version_string}'" }' > "${UNITY_BUILD_VERSION_FILE_PATH}"
+          echo '{ "mslGame": "'${new_version}'" }' > "${UNITY_BUILD_VERSION_FILE_PATH}"
         env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
 
