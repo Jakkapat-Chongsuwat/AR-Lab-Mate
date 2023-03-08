@@ -118,7 +118,7 @@ jobs:
       
       # run the upload script
       - name: run upload script
-        run: python .github/workflows/upload_file_firebase.py "${BUILD_ARCHIVE_NAME}" # the path to upload script in the repository
+        run: python .github/workflows/upload_file_firebase.py "${BUILD_ARCHIVE_NAME}".zip # the path to upload script in the repository
         env:
           BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }} 
 
@@ -147,18 +147,6 @@ jobs:
       #     FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
       #     BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
           
-      # - name: Commit and push changes
-      #   run: |
-      #     echo "Committing and pushing changes.."
-      #     git config user.name "GitHub Actions"
-      #     git config user.email "github-actions@github.com"
-      #     git add "${UNITY_BUILD_VERSION_FILE_PATH}"
-      #     git commit -m "Update build version to ${UNITY_PRODUCT_VERSION}"
-      #     git push
-      #   env:
-      #     UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
-      #     UNITY_PRODUCT_VERSION: ${{ env.UNITY_PRODUCT_VERSION }}
-
       # - name: Commit and push changes
       #   run: |
       #     echo "Committing and pushing changes.."
