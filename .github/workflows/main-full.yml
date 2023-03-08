@@ -165,11 +165,11 @@ jobs:
           echo "New mslLauncher value: $value" 
           
           # Modify JSON object to add launcher's key-value pair
-          new_json=$(echo ".github/workflows/${VERSION_FILE_NAME}" | jq --arg value "${value}" '. + { "mslLauncher": $value }') #New JSON object: mslGame": "new_version","mslLauncher": "mslLauncherVersion"
+          new_json=$(jq --arg value "$value" '. + {"mslLauncher": $value}' .github/workflows/$VERSION_FILE_NAME)
           echo "New JSON object: $new_json" 
 
           # Write modified JSON object to Version.json file
-          echo "${new_json}" > .github/workflows/${VERSION_FILE_NAME}
+          echo "$new_json" > .github/workflows/$VERSION_FILE_NAME
           echo "Version.json updated with mslLauncher value."
         working-directory: ${{ github.workspace }}
         env:
