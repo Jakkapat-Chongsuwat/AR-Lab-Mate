@@ -6,11 +6,7 @@ import sys
 # optional: Import UUID4 to create access token
 from uuid import uuid4
 
-# base64 decoded key file will be stored in temporary directory on runner machine
-# https://github.com/marketplace/actions/base64-to-file
-# githubTempPath = '/Users/runner/work/_temp'
-
-# define githubTempPath as the value of github.workspace
+# define githubTempPath as the path you store the key file
 githubTempPath = '.github/workflows/'
 
 # define the bucket name as a variable
