@@ -157,11 +157,11 @@ jobs:
 
       - name: Extract mslLauncher value from Firebase Storage
         run: |
-          python .github/workflows/download_file_firebase.py "tempVersion.json"
+          python .github/workflows/download_file_firebase.py "${FIREBASE_VERSION_FILE_NAME}"
           ls .github/workflows
 
           # Extract value from JSON
-          json=$(cat .github/workflows/tempVersion.json)
+          json=$(cat .github/workflows/${FIREBASE_VERSION_FILE_NAME})
           value=$(echo $json | jq -r '.mslLauncher')
           echo "New mslLauncher value: $value" 
           
