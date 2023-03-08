@@ -12,6 +12,7 @@ env:
   BUILD_ARCHIVE_NAME: "Test"
   FIREBASE_STORAGE_BUCKET: "Storage/MetaSchoolLiteData"
   FIREBASE_SERVICE_ACCOUNT_KEY: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}"
+  FIREBASE_VERSION_FILE_NAME: "Version.json"
   BUILD_TARGET_NAME: "${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}"
   BUILD_NUMBER: ${{ github.run_number }}
 
@@ -80,7 +81,7 @@ jobs:
             exit 1
           fi
 
-      - name: Update Unity build version
+      - name: Update Unity build version and create "Version.json" file
         run: |
           echo "Incrementing Unity build version.."
           ls ${UNITY_BUILD_VERSION_FILE_PATH}
@@ -88,8 +89,9 @@ jobs:
           new_version=$(echo "${current_version}" | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
           echo "Current version: ${current_version}"
           echo "New version: ${new_version}"
-          sed -i -e "s/${current_version}/${new_version}/g" "${UNITY_BUILD_VERSION_FILE_PATH}"
-          echo "${new_version}" > "${UNITY_BUILD_VERSION_FILE_PATH}"
+          
+          # Create new JSON object with mslGame key-value pair
+          echo '{ "mslGame": "'$new_version'" }' > "${UNITY_BUILD_VERSION_FILE_PATH}"
         env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
 
@@ -136,22 +138,45 @@ jobs:
       #     FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
       #     FIREBASE_SERVICE_ACCOUNT_KEY: ${{ env.FIREBASE_SERVICE_ACCOUNT_KEY }}
       #     BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }}
-      
-      # - name: Upload Unity build version to Firebase Storage
-      #   run: |
-      #     echo "Uploading Unity build version to Firebase Storage.."
-      #     echo "Unity build version: $UNITY_PRODUCT_VERSION" >> Version.txt
-      #     gsutil cp Version.txt gs://${FIREBASE_STORAGE_BUCKET}/Version
-      #   env:
-      #     UNITY_PRODUCT_VERSION: ${{ env.UNITY_PRODUCT_VERSION }}
-      #     FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
-      #     BUILD_TARGET_NAME: ${{ env.BUILD_TARGET_NAME }}
+
+      - name: Create Unity build version
+        run: |
+          echo "Creating Unity build version json..."
+          echo '{"mslGame":"$UNITY_PRODUCT_VERSION"}' > .github/workflows/Version.json
+        env:
+          UNITY_PRODUCT_VERSION: ${{ env.UNITY_PRODUCT_VERSION }}
+
+      - name: Extract mslLauncher value from Firebase Storage
+        run: |
+          # Install jq and download file
+          sudo apt-get update && sudo apt-get -y install jq
+          export GOOGLE_APPLICATION_CREDENTIALS='.github/workflows/GOOGLE_SERVICE_KEY.json'
+          gsutil -u firebase-storage-transfer -h "Authorization: Bearer $FIREBASE_TOKEN" cp $FIREBASE_STORAGE_FILE .github/workflows/$FIREBASE_VERSION_FILE_NAME
           
-      # - name: Commit and push changes
-      #   run: |
-      #     echo "Committing and pushing changes.."
-      #     git config user.name "GitHub Actions"
-      #     git config user.email "github-actions@github.com"
-      #     git add "${UNITY_BUILD_VERSION_FILE_PATH}"
-      #     git commit -m "Update build version to ${UNITY_PRODUCT_VERSION}"
-      #     git push
+          # Extract value from JSON
+          json=$(cat .github/workflows/${FIREBASE_VERSION_FILE_NAME})
+          value=$(echo $json | jq -r '.mslLauncher')
+          echo "New mslLauncher value: $value"
+          
+          # Modify JSON object to add launcher's key-value pair
+          new_json=$(echo $json | jq --arg value "${value}" '. + { "mslLauncher": $value }')
+          echo "New JSON object: $new_json"
+          
+          # Write new JSON object to file
+          echo $new_json > ${UNITY_BUILD_VERSION_FILE_PATH}
+          echo "New JSON object written to file: ${UNITY_BUILD_VERSION_FILE_PATH}"
+        working-directory: ${{ github.workspace }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          FIREBASE_STORAGE_FILE: gs://${{ env.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_VERSION_FILE_NAME: ${{ env.FIREBASE_VERSION_FILE_NAME }}
+          UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}          
+          
+      - name: Commit and push changes
+        run: |
+          echo "Committing and pushing changes.."
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          git add "${UNITY_BUILD_VERSION_FILE_PATH}"
+          git commit -m "Update build version to ${UNITY_PRODUCT_VERSION}"
+          git push

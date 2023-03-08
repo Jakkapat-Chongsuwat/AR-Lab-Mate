@@ -20,7 +20,7 @@ keyFilePath = githubTempPath + '/GOOGLE_SERVICE_KEY.json'
 # apply the bucket domain to the credentials
 cred = credentials.Certificate(keyFilePath)
 firebase_admin.initialize_app(cred, {
-    'storageBucket' : 'Storage.appspot.com'
+    'storageBucket' : 'Storage/MetaSchoolLiteData.appspot.com'
 })
 
 # refer to the storage bucket
@@ -29,7 +29,7 @@ bucket = storage.bucket()
 # get the upload file's path in repository's directory
 # the file to upload in this scenario (a zip file) is in the same directory with the script
 if len(sys.argv) > 1:
-    fileName = 'MetaSchoolLiteData/' + sys.argv[1]
+    fileName = sys.argv[1]
 else:
     print("Error: File name not specified as a command-line argument.")
     exit()
