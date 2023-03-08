@@ -13,6 +13,12 @@ from uuid import uuid4
 # define githubTempPath as the value of github.workspace
 githubTempPath = '.github/workflows/'
 
+# define the bucket name as a variable
+bucket_name = 'metaschoolmeet-ff047'
+
+# define the folder path in firebase storage
+firebaseFolderPath = 'MetaSchoolLiteData/'
+
 # google cloud's service account key file absolute path on github's machine directory
 # note that the file name must be matched with the file name created from timheuer/base64-to-file@v1 action on the workflow
 keyFilePath = githubTempPath + '/GOOGLE_SERVICE_KEY.json'
@@ -20,7 +26,7 @@ keyFilePath = githubTempPath + '/GOOGLE_SERVICE_KEY.json'
 # apply the bucket domain to the credentials
 cred = credentials.Certificate(keyFilePath)
 firebase_admin.initialize_app(cred, {
-    'storageBucket' : 'Storage.appspot.com'
+    'storageBucket' : bucket_name
 })
 
 # refer to the storage bucket
@@ -37,7 +43,7 @@ dirname = os.path.dirname(os.path.realpath(__file__))
 fileFullPath = dirname + '/' + fileName
 
 # if the file name contains file path, the bucket will create folders corresponding to the path.
-blob = bucket.blob(fileName)
+blob = bucket.blob(firebaseFolderPath + fileName)
 
 # optional: Create new token, this one only used for downloading directly from firebase console page
 accessToken = uuid4()
