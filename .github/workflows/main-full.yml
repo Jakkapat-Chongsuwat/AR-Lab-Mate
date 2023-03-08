@@ -121,6 +121,7 @@ jobs:
 
           # Set new version as an environment variable
           echo "export NEW_VERSION=$(echo "${new_version}" | tr -d '[:space:]')" >> $GITHUB_ENV
+          echo "New version: ${new_version}"
           echo "New version: ${{ env.NEW_VERSION }}"
 
           # Create new JSON object with mslGame key-value pair
