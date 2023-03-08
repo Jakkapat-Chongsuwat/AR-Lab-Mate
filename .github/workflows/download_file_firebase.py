@@ -35,6 +35,7 @@ fileFullPath = dirname + '/' + fileName
 blob = bucket.blob(firebaseFolderPath + fileName)
 
 # download from firebase storage
-blob.download_to_file(fileFullPath)
+with open(fileFullPath, 'wb') as file:
+    blob.download_to_file(file)
 
 print("Downloaded file from Firebase Storage: ", fileFullPath)
