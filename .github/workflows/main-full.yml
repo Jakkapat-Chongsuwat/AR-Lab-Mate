@@ -150,13 +150,24 @@ jobs:
           existing_json=$(echo "${existing_json}" | jq -c '.') # compact JSON with all the keys in one line
           echo "Existing JSON object: $existing_json" 
 
+          # Upload existing_json as an artifact
+          echo "${existing_json}" > existing.json
+          echo "Uploading existing.json as artifact..."
+          upload-artifact existing.json
+
           # Modify JSON object to add launcher's key-value pair
           new_json=$(echo "${existing_json}" | jq --arg value "${value}" '. + { "mslLauncher": $value }') #New JSON object: mslGame": "new_version","mslLauncher": "mslLauncherVersion"
           echo "New JSON object: $new_json" 
 
           # Store new_json as an environment variable using export
           echo "NEW_JSON=$(echo "${new_json}" | tr -d '[:space:]')" >> $GITHUB_ENV
-          echo "New JSON object stored as an environment variable"         
+          echo "New JSON object stored as an environment variable"
+
+          # Upload existing_json as an artifact
+          echo "${new_json}" > NEW_JSON.json
+          echo "Uploading NEW_JSON.json as artifact..."
+          upload-artifact NEW_JSON.json         
+
         working-directory: ${{ github.workspace }}
         env:
           FIREBASE_VERSION_FILE_NAME: ${{ env.FIREBASE_VERSION_FILE_NAME }}
