@@ -122,7 +122,7 @@ jobs:
           delimiter="$(openssl rand -hex 8)"
           echo "new_version<<${delimiter}" >> ${GITHUB_ENV}
           echo "${new_version}" >> ${GITHUB_ENV}
-          echo "${delimiter}" >> ${GITHUB_ENV}"
+          echo "${delimiter}" >> ${GITHUB_ENV}
           
           # Set new version as an environment variable
           echo "export NEW_VERSION=${new_version}" >> $GITHUB_ENV
