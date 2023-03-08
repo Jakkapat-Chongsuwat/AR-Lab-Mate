@@ -120,7 +120,7 @@ jobs:
           echo "Current version: ${current_version}"
 
           # Set new version as an environment variable
-          echo "export NEW_VERSION=$(echo "${new_version}" | tr -d '[:space:]')" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(echo "${new_version}" | tr -d '[:space:]')" >> $GITHUB_ENV
           echo "New version: ${new_version}"
           echo "New version: ${{ env.NEW_VERSION }}"
 
