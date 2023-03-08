@@ -149,13 +149,11 @@ jobs:
           echo "New JSON object: $new_json" 
 
           # Store new_json as an environment variable using export
-          echo "export NEW_JSON='${new_json}'" >> $GITHUB_ENV
+          echo "NEW_JSON=$(echo "${new_json}" | tr -d '[:space:]')" >> $GITHUB_ENV
           echo "New JSON object stored as an environment variable"         
         working-directory: ${{ github.workspace }}
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           FIREBASE_VERSION_FILE_NAME: ${{ env.FIREBASE_VERSION_FILE_NAME }}
-          UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}          
 
       - name: Run version upload script
         run: python .github/workflows/upload_file_firebase.py "$NEW_JSON" # the path to upload script in the repository
