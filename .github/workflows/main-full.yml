@@ -127,7 +127,7 @@ jobs:
 
           # Create new JSON object with mslGame key-value pair
           echo '{ "mslGame": "'${new_version}'" }' > "${UNITY_BUILD_VERSION_FILE_PATH}"
-          echo "Version.json content: ${UNITY_BUILD_VERSION_FILE_PATH}"
+          echo "Version.json content: $(cat Version.json)
         env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
           NEW_VERSION: ${{ env.NEW_VERSION }}
