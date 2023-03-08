@@ -14,7 +14,7 @@ from uuid import uuid4
 githubTempPath = '.github/workflows/'
 
 # define the bucket name as a variable
-bucket_name = 'metaschoolmeet-ff047'
+bucket_name = 'ff047'
 
 # define the folder path in firebase storage
 firebaseFolderPath = 'MetaSchoolLiteData/'
