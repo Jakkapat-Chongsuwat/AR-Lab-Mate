@@ -121,7 +121,7 @@ jobs:
           echo "New version: ${new_version}"
           
           # Set new_version as an environment variable
-          echo "new_version=${new_version}" >> $GITHUB_ENV
+          echo "export NEW_VERSION=${new_version}" >> $GITHUB_ENV
           
           # Create new JSON object with mslGame key-value pair
           echo '{ "mslGame": "'$new_version'" }' > "${UNITY_BUILD_VERSION_FILE_PATH}"
@@ -131,7 +131,7 @@ jobs:
       - name: Create Unity build version
         run: |
           echo "Creating Unity build version json..."
-          echo '{"mslGame":${{ env.new_version }}}' > .github/workflows/${{ env.VERSION_FILE_NAME }}
+          echo '{"mslGame":${{ env.NEW_VERSION }}}' > .github/workflows/${{ env.VERSION_FILE_NAME }}
           echo "Version.json created."
           ls .github/workflows
           # echo "Version.json content: $(cat .github/workflows/Version.json)"
@@ -171,5 +171,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
           git add "${UNITY_BUILD_VERSION_FILE_PATH}"
-          git commit -m "Update build version to ${{ env.new_version }}"
+          git commit -m "Update build version to ${{ env.NEW_VERSION }}"
           git push
