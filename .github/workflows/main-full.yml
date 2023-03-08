@@ -132,7 +132,7 @@ jobs:
           echo '{"mslGame":${{ env.NEW_VERSION }}}' > .github/workflows/${{ env.VERSION_FILE_NAME }}
           echo "Version.json created."
           ls .github/workflows
-          # echo "Version.json content: $(cat .github/workflows/Version.json)"
+          # echo "Version.json content: $(Version.json)"
 
       - name: Extract mslLauncher value from Firebase Storage
         run: |
@@ -144,8 +144,14 @@ jobs:
           value=$(echo $json | jq -r '.mslLauncher')
           echo "New mslLauncher value: $value" 
           
+          # Parse existing JSON object
+          existing_json=$(cat .github/workflows/${FIREBASE_VERSION_FILE_NAME})
+          existing_json="${existing_json%?}" # remove the closing bracket "}" at the end of the existing JSON
+          existing_json=$(echo "${existing_json}" | jq -c '.') # compact JSON with all the keys in one line
+          echo "Existing JSON object: $existing_json" 
+
           # Modify JSON object to add launcher's key-value pair
-          new_json=$(echo $json | jq --arg value "${value}" '. + { "mslLauncher": $value }') #New JSON object: mslGame": "new_version","mslLauncher": "mslLauncherVersion"
+          new_json=$(echo "${existing_json}" | jq --arg value "${value}" '. + { "mslLauncher": $value }') #New JSON object: mslGame": "new_version","mslLauncher": "mslLauncherVersion"
           echo "New JSON object: $new_json" 
 
           # Store new_json as an environment variable using export
