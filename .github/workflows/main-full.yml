@@ -148,11 +148,6 @@ jobs:
           new_json=$(echo $json | jq --arg value "${value}" '. + { "mslLauncher": $value }') #New JSON object: mslGame": "new_version","mslLauncher": "mslLauncherVersion"
           echo "New JSON object: $new_json" 
 
-          # Upload existing_json as an artifact
-          echo "${new_json}" > new_json.json
-          echo "Uploading new_json.json as artifact..."
-          upload-artifact new_json.json 
-
           # Store new_json as an environment variable using export
           echo "NEW_JSON=$(echo "${new_json}" | tr -d '[:space:]')" >> $GITHUB_ENV
           echo "New JSON object stored as an environment variable"         
@@ -165,6 +160,12 @@ jobs:
         with:
           name: new_json
           path: .github/workflows/new_json.json
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Version_JSON
+          path: .github/workflows/Version.json
 
       - name: Run version upload script
         run: python .github/workflows/upload_file_firebase.py "${VERSION_FILE_NAME}" # the path to upload script in the repository
