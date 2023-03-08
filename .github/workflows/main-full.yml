@@ -156,10 +156,10 @@ jobs:
           FIREBASE_VERSION_FILE_NAME: ${{ env.FIREBASE_VERSION_FILE_NAME }}
 
       - name: Run version upload script
-        run: python .github/workflows/upload_file_firebase.py "$NEW_JSON" # the path to upload script in the repository
+        run: python .github/workflows/upload_file_firebase.py "${VERSION_FILE_NAME}" # the path to upload script in the repository
         env:
           BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }} 
-          NEW_JSON: ${{ env.NEW_JSON }}
+          VERSION_FILE_NAME: ${{ env.VERSION_FILE_NAME }}
 
       - name: Commit and push changes
         run: |
