@@ -130,6 +130,7 @@ jobs:
           echo "Version.json content: ${UNITY_BUILD_VERSION_FILE_PATH}"
         env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
+          NEW_VERSION: ${{ env.NEW_VERSION }}
 
       - name: Create Unity build version
         run: |
