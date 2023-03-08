@@ -118,11 +118,11 @@ jobs:
           current_version=$(grep -oP '\d+\.\d+\.\d+' "${UNITY_BUILD_VERSION_FILE_PATH}")
           new_version=$(echo "${current_version}" | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
 
-          # Create a new environment variable with the new version and surround with random delimiter to ensure the variable can be read properly later in the workflow
-          delimiter="$(openssl rand -hex 8)"
-          echo "new_version<<${delimiter}" >> ${GITHUB_ENV}
-          echo "${new_version}" >> ${GITHUB_ENV}
-          echo "${delimiter}" >> ${GITHUB_ENV}
+          # # Create a new environment variable with the new version and surround with random delimiter to ensure the variable can be read properly later in the workflow
+          # delimiter="$(openssl rand -hex 8)"
+          # echo "new_version<<${delimiter}" >> ${GITHUB_ENV}
+          # echo "${new_version}" >> ${GITHUB_ENV}
+          # echo "${delimiter}" >> ${GITHUB_ENV}
           
           # Set new version as an environment variable
           echo "export NEW_VERSION=${new_version}" >> $GITHUB_ENV
