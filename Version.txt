@@ -1,1 +1,1 @@
-{ "mslGame": "0.0.2", "mslLauncher": "0.0.2" }
+{ "mslGame": "0.0.3 0.0.3" }
