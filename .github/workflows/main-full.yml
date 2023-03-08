@@ -149,16 +149,9 @@ jobs:
 
       - name: Extract mslLauncher value from Firebase Storage
         run: |
-          # Install jq and Firebase CLI
-          sudo apt-get update && sudo apt-get -y install jq
-          sudo npm install -g firebase-tools
+          python .github/workflows/download_file_firebase.py "${FIREBASE_VERSION_FILE_NAME}"
+          ls .github/workflows
 
-          # Authenticate with Firebase CLI
-          firebase login:ci --no-localhost --token "${FIREBASE_TOKEN}"
-
-          # Download file and extract value from JSON
-          firebase storage:download --token "${FIREBASE_TOKEN}" "${FIREBASE_STORAGE_FILE}" .github/workflows/"${FIREBASE_VERSION_FILE_NAME}"
-          
           # Extract value from JSON
           json=$(cat .github/workflows/${FIREBASE_VERSION_FILE_NAME})
           value=$(echo $json | jq -r '.mslLauncher')
@@ -174,7 +167,6 @@ jobs:
         working-directory: ${{ github.workspace }}
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-          FIREBASE_STORAGE_FILE: gs://${{ env.FIREBASE_STORAGE_BUCKET }}
           FIREBASE_VERSION_FILE_NAME: ${{ env.FIREBASE_VERSION_FILE_NAME }}
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}          
           
