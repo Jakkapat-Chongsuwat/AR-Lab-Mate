@@ -30,56 +30,56 @@ jobs:
           echo "Unity project path: ${UNITY_PROJECT_PATH}"
           echo "export UNITY_PROJECT_PATH=${UNITY_PROJECT_PATH}" >> $GITHUB_ENV
                       
-      - name: Unity Cloud Build
-        run: |
-          echo "Starting Unity Cloud Build.."
-          response=$(curl -s -X POST \
-          https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds \
-          -H "Authorization: Basic ${{ secrets.API_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d '{"clean": false, "delay": 0, "scm": {"branch": "${{ github.ref }}", "commitId": "${{ github.sha }}", "commitMessage": "${{ github.event.head_commit.message }}", "commitDate": "${{ github.event.head_commit.timestamp }}"}}')
-          echo "API response: $response"
-          build_id=$(echo $response | jq -r '.[0].build')
-          echo "Build ID: $build_id"
+      # - name: Unity Cloud Build
+      #   run: |
+      #     echo "Starting Unity Cloud Build.."
+      #     response=$(curl -s -X POST \
+      #     https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds \
+      #     -H "Authorization: Basic ${{ secrets.API_KEY }}" \
+      #     -H "Content-Type: application/json" \
+      #     -d '{"clean": false, "delay": 0, "scm": {"branch": "${{ github.ref }}", "commitId": "${{ github.sha }}", "commitMessage": "${{ github.event.head_commit.message }}", "commitDate": "${{ github.event.head_commit.timestamp }}"}}')
+      #     echo "API response: $response"
+      #     build_id=$(echo $response | jq -r '.[0].build')
+      #     echo "Build ID: $build_id"
 
-          status="pending"
-          while [[ "$status" != "success" && "$status" != "failure" && "$status" != "canceled" ]]
-          do
-            echo "Checking build status..."
-            status_response=$(curl -s https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id -H "Authorization: Basic ${{ secrets.API_KEY }}")
-            # echo "API response: $status_response"
-            status=$(echo $status_response | jq -r '.buildStatus')
-            echo "Build status: $status"
-            sleep 5
-          done
+      #     status="pending"
+      #     while [[ "$status" != "success" && "$status" != "failure" && "$status" != "canceled" ]]
+      #     do
+      #       echo "Checking build status..."
+      #       status_response=$(curl -s https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id -H "Authorization: Basic ${{ secrets.API_KEY }}")
+      #       # echo "API response: $status_response"
+      #       status=$(echo $status_response | jq -r '.buildStatus')
+      #       echo "Build status: $status"
+      #       sleep 5
+      #     done
 
-          if [[ "$status" == "success" ]]
-          then
-            echo "Build completed successfully."
-            echo "Setting artifact path.."
+      #     if [[ "$status" == "success" ]]
+      #     then
+      #       echo "Build completed successfully."
+      #       echo "Setting artifact path.."
             
-            # Call Unity Cloud Build API to get artifact share link
-            get_share_id_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id/share -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
+      #       # Call Unity Cloud Build API to get artifact share link
+      #       get_share_id_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id/share -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
 
-            shareid=$(echo $get_share_id_response | jq -r '.shareid')
-            echo "API response: $shareid"
+      #       shareid=$(echo $get_share_id_response | jq -r '.shareid')
+      #       echo "API response: $shareid"
 
-            get_share_link_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/shares/$shareid -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
+      #       get_share_link_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/shares/$shareid -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
 
-            SHARE_LINK=$(echo $get_share_link_response | jq -r '.links.download_primary.href')
-            echo "API response: $SHARE_LINK"
+      #       SHARE_LINK=$(echo $get_share_link_response | jq -r '.links.download_primary.href')
+      #       echo "API response: $SHARE_LINK"
 
-            # Store SHARE_LINK as an environment variable using export
-            echo "export SHARE_LINK=${SHARE_LINK}" >> $GITHUB_ENV
-            echo "Artifact found at ${{ env.SHARE_LINK }}"
+      #       # Store SHARE_LINK as an environment variable using export
+      #       echo "export SHARE_LINK=${SHARE_LINK}" >> $GITHUB_ENV
+      #       echo "Artifact found at ${{ env.SHARE_LINK }}"
 
-            echo "Download link: $SHARE_LINK"
-            curl -L -o ".github/workflows/${{ env.BUILD_ARCHIVE_NAME }}".zip "$SHARE_LINK"
+      #       echo "Download link: $SHARE_LINK"
+      #       curl -L -o ".github/workflows/${{ env.BUILD_ARCHIVE_NAME }}".zip "$SHARE_LINK"
 
-          else
-            echo "Build failed or was canceled."
-            exit 1
-          fi
+      #     else
+      #       echo "Build failed or was canceled."
+      #       exit 1
+      #     fi
 
       - name: Update Unity build version and create "Version.json" file
         run: |
