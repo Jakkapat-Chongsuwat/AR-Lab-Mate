@@ -120,11 +120,12 @@ jobs:
           echo "Current version: ${current_version}"
 
           # Set new version as an environment variable
-          echo "NEW_VERSION=$(echo "${new_version}" | tr -d '[:space:]')" >> $GITHUB_ENV
+          echo "export NEW_VERSION=$(echo "${new_version}" | tr -d '[:space:]')" >> $GITHUB_ENV
           echo "New version: ${{ env.NEW_VERSION }}"
 
           # Create new JSON object with mslGame key-value pair
           echo '{ "mslGame": "'${new_version}'" }' > "${UNITY_BUILD_VERSION_FILE_PATH}"
+          echo "Version.json content: ${UNITY_BUILD_VERSION_FILE_PATH}"
         env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
 
