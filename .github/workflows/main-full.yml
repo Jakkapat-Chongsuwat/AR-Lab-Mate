@@ -105,10 +105,16 @@ jobs:
       # write the Credential json secrect key from git_secrect
       - name: get secrect key
         id: write_key_file
-        uses: timheuer/base64-to-file@v1
+        uses: timheuer/base64-to-file@v1.2
         with:
           fileName: 'GOOGLE_SERVICE_KEY.json' # name of the written key file
+          fileDir: '/Users/runner/work/_temp'
           encodedString: ${{ secrets.GOOGLE_SERVICE_KEY }} # Secret stored in Github secrets
+
+      - name: Check all files in temp directory
+        run: |
+          # list all files in the temp directory
+          ls /Users/runner/work/_temp          
       
       # run the upload script
       - name: run upload script
