@@ -15,6 +15,7 @@ env:
   BUILD_TARGET_NAME: "${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}"
   BUILD_NUMBER: ${{ github.run_number }}
   VERSION_FILE_NAME: "VersionTest.json"
+  NEW_VERSION: ""
 
 jobs:
   build:
