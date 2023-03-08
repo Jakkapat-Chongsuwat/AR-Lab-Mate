@@ -108,13 +108,13 @@ jobs:
         uses: timheuer/base64-to-file@v1.2
         with:
           fileName: 'GOOGLE_SERVICE_KEY.json' # name of the written key file
-          fileDir: '/Users/runner/work/_temp'
+          fileDir: '.github/workflows'
           encodedString: ${{ secrets.GOOGLE_SERVICE_KEY }} # Secret stored in Github secrets
 
       - name: Check all files in temp directory
         run: |
           # list all files in the temp directory
-          ls /Users/runner/work/_temp          
+          ls .github/workflows        
       
       # run the upload script
       - name: run upload script

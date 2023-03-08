@@ -8,7 +8,10 @@ from uuid import uuid4
 
 # base64 decoded key file will be stored in temporary directory on runner machine
 # https://github.com/marketplace/actions/base64-to-file
-githubTempPath = '/Users/runner/work/_temp'
+# githubTempPath = '/Users/runner/work/_temp'
+
+# define githubTempPath as the value of github.workspace
+githubTempPath = '.github/workflows/'
 
 # google cloud's service account key file absolute path on github's machine directory
 # note that the file name must be matched with the file name created from timheuer/base64-to-file@v1 action on the workflow
