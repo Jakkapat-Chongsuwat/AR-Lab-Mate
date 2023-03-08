@@ -20,7 +20,7 @@ keyFilePath = githubTempPath + '/GOOGLE_SERVICE_KEY.json'
 # apply the bucket domain to the credentials
 cred = credentials.Certificate(keyFilePath)
 firebase_admin.initialize_app(cred, {
-    'storageBucket' : 'Storage/MetaSchoolLiteData.appspot.com'
+    'storageBucket' : 'Storage.appspot.com'
 })
 
 # refer to the storage bucket
