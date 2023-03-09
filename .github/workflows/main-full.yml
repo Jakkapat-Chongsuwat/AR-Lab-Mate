@@ -4,17 +4,21 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Unity Build Workflow"]
+    types:
+      - completed
 
 env:
   UNITY_VERSION: "2019.4.37f1"
   UNITY_BUILD_VERSION_FILE_PATH: "Version.txt"
   BUILD_ARCHIVE_NAME: "Test"
+  VERSION_FILE_NAME: "VersionTest.json"
   FIREBASE_STORAGE_BUCKET: "Storage/MetaSchoolLiteData"
   FIREBASE_SERVICE_ACCOUNT_KEY: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}"
   FIREBASE_VERSION_FILE_NAME: "Version.json"
   BUILD_TARGET_NAME: "${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}"
   BUILD_NUMBER: ${{ github.run_number }}
-  VERSION_FILE_NAME: "VersionTest.json"
   NEW_VERSION: ""
 
 jobs:
@@ -31,56 +35,56 @@ jobs:
           echo "Unity project path: ${UNITY_PROJECT_PATH}"
           echo "export UNITY_PROJECT_PATH=${UNITY_PROJECT_PATH}" >> $GITHUB_ENV
                       
-      # - name: Unity Cloud Build
-      #   run: |
-      #     echo "Starting Unity Cloud Build.."
-      #     response=$(curl -s -X POST \
-      #     https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds \
-      #     -H "Authorization: Basic ${{ secrets.API_KEY }}" \
-      #     -H "Content-Type: application/json" \
-      #     -d '{"clean": false, "delay": 0, "scm": {"branch": "${{ github.ref }}", "commitId": "${{ github.sha }}", "commitMessage": "${{ github.event.head_commit.message }}", "commitDate": "${{ github.event.head_commit.timestamp }}"}}')
-      #     echo "API response: $response"
-      #     build_id=$(echo $response | jq -r '.[0].build')
-      #     echo "Build ID: $build_id"
+      - name: Unity Cloud Build
+        run: |
+          echo "Starting Unity Cloud Build.."
+          response=$(curl -s -X POST \
+          https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds \
+          -H "Authorization: Basic ${{ secrets.API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"clean": false, "delay": 0, "scm": {"branch": "${{ github.ref }}", "commitId": "${{ github.sha }}", "commitMessage": "${{ github.event.head_commit.message }}", "commitDate": "${{ github.event.head_commit.timestamp }}"}}')
+          echo "API response: $response"
+          build_id=$(echo $response | jq -r '.[0].build')
+          echo "Build ID: $build_id"
 
-      #     status="pending"
-      #     while [[ "$status" != "success" && "$status" != "failure" && "$status" != "canceled" ]]
-      #     do
-      #       echo "Checking build status..."
-      #       status_response=$(curl -s https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id -H "Authorization: Basic ${{ secrets.API_KEY }}")
-      #       # echo "API response: $status_response"
-      #       status=$(echo $status_response | jq -r '.buildStatus')
-      #       echo "Build status: $status"
-      #       sleep 5
-      #     done
+          status="pending"
+          while [[ "$status" != "success" && "$status" != "failure" && "$status" != "canceled" ]]
+          do
+            echo "Checking build status..."
+            status_response=$(curl -s https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id -H "Authorization: Basic ${{ secrets.API_KEY }}")
+            # echo "API response: $status_response"
+            status=$(echo $status_response | jq -r '.buildStatus')
+            echo "Build status: $status"
+            sleep 5
+          done
 
-      #     if [[ "$status" == "success" ]]
-      #     then
-      #       echo "Build completed successfully."
-      #       echo "Setting artifact path.."
+          if [[ "$status" == "success" ]]
+          then
+            echo "Build completed successfully."
+            echo "Setting artifact path.."
             
-      #       # Call Unity Cloud Build API to get artifact share link
-      #       get_share_id_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id/share -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
+            # Call Unity Cloud Build API to get artifact share link
+            get_share_id_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/orgs/${{ secrets.ORG_ID }}/projects/${{ secrets.PROJECT_ID }}/buildtargets/${{ secrets.BUILD_TARGET_ID_WINDOWS64 }}/builds/$build_id/share -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
 
-      #       shareid=$(echo $get_share_id_response | jq -r '.shareid')
-      #       echo "API response: $shareid"
+            shareid=$(echo $get_share_id_response | jq -r '.shareid')
+            echo "API response: $shareid"
 
-      #       get_share_link_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/shares/$shareid -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
+            get_share_link_response=$(curl -s -X GET https://build-api.cloud.unity3d.com/api/v1/shares/$shareid -H "Authorization: Basic ${{ secrets.API_KEY }}" -H "Content-Type: application/json") 
 
-      #       SHARE_LINK=$(echo $get_share_link_response | jq -r '.links.download_primary.href')
-      #       echo "API response: $SHARE_LINK"
+            SHARE_LINK=$(echo $get_share_link_response | jq -r '.links.download_primary.href')
+            echo "API response: $SHARE_LINK"
 
-      #       # Store SHARE_LINK as an environment variable using export
-      #       echo "export SHARE_LINK=${SHARE_LINK}" >> $GITHUB_ENV
-      #       echo "Artifact found at ${{ env.SHARE_LINK }}"
+            # Store SHARE_LINK as an environment variable using export
+            echo "export SHARE_LINK=${SHARE_LINK}" >> $GITHUB_ENV
+            echo "Artifact found at ${{ env.SHARE_LINK }}"
 
-      #       echo "Download link: $SHARE_LINK"
-      #       curl -L -o ".github/workflows/${{ env.BUILD_ARCHIVE_NAME }}".zip "$SHARE_LINK"
+            echo "Download link: $SHARE_LINK"
+            curl -L -o ".github/workflows/${{ env.BUILD_ARCHIVE_NAME }}".zip "$SHARE_LINK"
 
-      #     else
-      #       echo "Build failed or was canceled."
-      #       exit 1
-      #     fi
+          else
+            echo "Build failed or was canceled."
+            exit 1
+          fi
 
       # install python for running the script
       - name: Setup Python and dependencies
@@ -125,34 +129,14 @@ jobs:
           echo "New version: ${new_version}"
 
           echo "Creating Unity build version json..."
-          echo '{"mslGame":"'${new_version}'"}' > .github/workflows/${{ env.VERSION_FILE_NAME }}
+          echo '{"mslGame":"'${new_version}'"}' > .github/workflows/${VERSION_FILE_NAME}
           echo "Version.json content:" 
-          cat .github/workflows/${{ env.VERSION_FILE_NAME }}
+          cat .github/workflows/${VERSION_FILE_NAME}
           ls .github/workflows
         env:
           UNITY_BUILD_VERSION_FILE_PATH: ${{ env.UNITY_BUILD_VERSION_FILE_PATH }}
           NEW_VERSION: ${{ env.NEW_VERSION }}
-
-      # - name: Extract mslLauncher value from Firebase Storage
-      #   run: |
-      #     python .github/workflows/download_file_firebase.py "${FIREBASE_VERSION_FILE_NAME}"
-      #     ls .github/workflows
-
-      #     # Extract value from JSON
-      #     json=$(cat .github/workflows/${FIREBASE_VERSION_FILE_NAME})
-      #     value=$(echo $json | jq -r '.mslLauncher')
-      #     echo "New mslLauncher value: $value" 
-          
-      #     # Modify JSON object to add launcher's key-value pair
-      #     new_json=$(echo $json | jq --arg value "${value}" '. + { "mslLauncher": $value }') #New JSON object: mslGame": "new_version","mslLauncher": "mslLauncherVersion"
-      #     echo "New JSON object: $new_json" 
-
-      #     # Store new_json as an environment variable using export
-      #     echo "NEW_JSON=$(echo "${new_json}" | tr -d '[:space:]')" >> $GITHUB_ENV
-      #     echo "New JSON object stored as an environment variable"         
-      #   working-directory: ${{ github.workspace }}
-      #   env:
-      #     FIREBASE_VERSION_FILE_NAME: ${{ env.FIREBASE_VERSION_FILE_NAME }}
+          VERSION_FILE_NAME: ${{ env.VERSION_FILE_NAME }}
 
       - name: Extract mslLauncher value from Firebase Storage
         run: |
@@ -179,12 +163,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: new_json
-          path: .github/workflows/new_json.json
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
           name: Version_JSON
           path: .github/workflows/Version.json
 
@@ -194,6 +172,7 @@ jobs:
           BUILD_ARCHIVE_NAME: ${{ env.BUILD_ARCHIVE_NAME }} 
           VERSION_FILE_NAME: ${{ env.VERSION_FILE_NAME }}
 
+# Commit and push changes to the repository
       - name: Commit and push changes
         run: |
           echo "Committing and pushing changes.."
@@ -202,3 +181,29 @@ jobs:
           git add "${UNITY_BUILD_VERSION_FILE_PATH}"
           git commit -m "Update build version to ${{ env.NEW_VERSION }}"
           git push
+
+# This workflow will cancel any previous runs of the same workflow that are still in progress when a new commit is pushed.
+      - name: Check if a new workflow has started
+        if: >
+          github.event_name == 'workflow_run' &&
+          github.event.workflow_run.head_branch == github.ref &&
+          github.event.workflow_run.head_sha != github.sha
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const workflow = await github.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            });
+            if (workflow.data.head_sha != context.sha) {
+              console.log(`A new workflow has started (${workflow.data.head_sha}). Cancelling current workflow (${context.sha})...`);
+              await github.actions.cancelWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: context.runId
+              });
+            } else {
+              console.log(`No new workflow detected. Continuing with current workflow (${context.sha})...`);
+            }
